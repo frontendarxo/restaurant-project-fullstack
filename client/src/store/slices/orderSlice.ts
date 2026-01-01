@@ -27,7 +27,7 @@ export const fetchOrderById = createAsyncThunk('order/fetchById', async (orderId
 });
 
 export const create = createAsyncThunk('order/create', async () => {
-  const response = await createOrder([]);
+  const response = await createOrder();
   return response.order;
 });
 

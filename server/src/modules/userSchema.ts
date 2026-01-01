@@ -1,4 +1,24 @@
-import { Schema, model } from "mongoose";
+import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import { Schema, model, Model, Document } from "mongoose";
+import { UnauthorizedError } from "../errors/unauthorized.js";
+import { JWT_SECRET } from "../utils/jwt.js";
+
+interface IUserDocument extends Document {
+    name: string;
+    number: number;
+    password: string;
+    adress: string;
+    cart: Array<{
+        food: Schema.Types.ObjectId;
+        quantity: number;
+    }>;
+    generateAuthToken(): string;
+}
+
+interface IUserModel extends Model<IUserDocument> {
+    findByCredentials(number: number, password: string): Promise<IUserDocument>;
+}
 
 const cartItemSchema = new Schema({
     food: {
@@ -26,11 +46,10 @@ const userSchema = new Schema({
         unique: [true, 'Такой номер уже занят'],
         validate: {
             validator: function(v: number) {
-                const phoneRegex = /^(?:\+7|8)\s?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
                 const numberStr = v.toString();
-                return numberStr.length === 11 && phoneRegex.test(numberStr);
+                return numberStr.length === 11 && numberStr.startsWith('8');
             },
-            message: 'Номер должен соответствовать формату'
+            message: 'Номер должен содержать 11 цифр и начинаться с 8'
         }
     },
     password: {
@@ -48,7 +67,7 @@ const userSchema = new Schema({
     adress: {
         type: String,
         required: true,
-        minlength: [5, 'Адрес должен быть не менее 10 символов']
+        minlength: [5, 'Адрес должен быть не менее 5 символов']
     },
     cart: {
         type: [cartItemSchema],
@@ -66,6 +85,30 @@ const userSchema = new Schema({
     timestamps: true  
 });
 
-const User = model('User', userSchema);
+
+userSchema.pre('save', async function() {
+    if (!this.isModified('password')) {
+        return;
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+userSchema.methods.generateAuthToken = function() {
+    return jwt.sign({ userId: this._id }, JWT_SECRET, { expiresIn: '7d' });
+}
+
+userSchema.statics.findByCredentials = async function(number: number, password: string) {
+    const user = await this.findOne({ number })
+    .select('+password')
+    .orFail(new UnauthorizedError('Неверный номер или пароль'));
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new UnauthorizedError('Неверный пароль');
+    }
+    return user;
+}
+
+const User = model<IUserDocument, IUserModel>('User', userSchema);
 
 export default User;

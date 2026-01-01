@@ -5,6 +5,7 @@ import type { Food } from '../../types/food';
 interface MenuState {
   foods: Food[];
   categories: string[];
+  selectedCategory: string;
   isLoading: boolean;
   error: string | null;
 }
@@ -12,6 +13,7 @@ interface MenuState {
 const initialState: MenuState = {
   foods: [],
   categories: [],
+  selectedCategory: 'all',
   isLoading: false,
   error: null,
 };
@@ -32,6 +34,9 @@ const menuSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    setSelectedCategory: (state, action) => {
+      state.selectedCategory = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -68,7 +73,7 @@ const menuSlice = createSlice({
   },
 });
 
-export const { clearError } = menuSlice.actions;
+export const { clearError, setSelectedCategory } = menuSlice.actions;
 export default menuSlice.reducer;
 
 

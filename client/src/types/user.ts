@@ -1,11 +1,15 @@
-import type { CartItem } from './food';
-
 export interface User {
   id: string;
   name: string;
   number: string;
   adress: string;
-  cart: CartItem[];
+}
+
+export interface RegisterData {
+  name: string;
+  number: string;
+  password: string;
+  adress: string;
 }
 
 export interface LoginCredentials {

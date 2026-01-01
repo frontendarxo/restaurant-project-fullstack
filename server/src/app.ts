@@ -10,7 +10,7 @@ if (!process.env.JWT_SECRET) {
     console.error('ОШИБКА: JWT_SECRET не установлен в переменных окружения');
     process.exit(1);
 }
-
+import cookieParser  from 'cookie-parser'
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -19,13 +19,31 @@ import router from './routers/index.js';
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 const connectDB = async () => {
     try {
+        // MongoDB connection URI with authentication support
+        // Format: mongodb://[username]:[password]@[host]:[port]/[database]?authSource=admin
+        // For Docker: use 'mongodb' as hostname when running in same network
+        // For local: use 'localhost' as hostname
         const mongoURL = process.env.MONGODB_URL || 'mongodb://localhost:27017/qatar-project';
-        await mongoose.connect(mongoURL);
+        
+        const connectionOptions: mongoose.ConnectOptions = {
+            // Connection options for better reliability
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        };
+
+        await mongoose.connect(mongoURL, connectionOptions);
         console.log('MongoDB подключена успешно');
     } catch (error) {
         console.error('Ошибка подключения к MongoDB:', error);

@@ -1,0 +1,18 @@
+.home {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home-loading,
+.home-error {
+  text-align: center;
+  padding: 2rem;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.home-error {
+  color: #ff4444;
+}
+

@@ -1,0 +1,125 @@
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-list-empty {
+  text-align: center;
+  padding: 3rem;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.order-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-card-id {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.order-card-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.order-card-status {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.order-card-status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.order-card-status-confirmed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.order-card-status-preparing {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.order-card-status-ready {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.order-card-status-delivered {
+  background-color: #d1f2eb;
+  color: #0d5d4f;
+}
+
+.order-card-status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.order-card-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-card-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.order-card-item-name {
+  flex: 1;
+  color: #333;
+}
+
+.order-card-item-quantity {
+  color: #666;
+  margin: 0 1rem;
+}
+
+.order-card-item-price {
+  font-weight: 600;
+  color: #8A1538;
+}
+
+.order-card-footer {
+  padding-top: 1rem;
+  border-top: 2px solid #8A1538;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.order-card-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #8A1538;
+}
+

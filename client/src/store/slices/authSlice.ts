@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '../../api/auth';
-import type { User, AuthState, LoginCredentials } from '../../types/user';
+import type { User, AuthState, LoginCredentials, RegisterData } from '../../types/user';
 
 const initialState: AuthState & { isLoading: boolean; error: string | null } = {
   user: null,
@@ -24,8 +24,8 @@ export const login = createAsyncThunk(
 
 export const register = createAsyncThunk(
   'auth/register',
-  async (user: User) => {
-    const response = await registerUser(user);
+  async (userData: RegisterData) => {
+    const response = await registerUser(userData);
     if (response.token) {
       localStorage.setItem('token', response.token);
     }
@@ -62,6 +62,9 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        if (action.payload.token) {
+          localStorage.setItem('token', action.payload.token);
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -76,6 +79,9 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        if (action.payload.token) {
+          localStorage.setItem('token', action.payload.token);
+        }
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;

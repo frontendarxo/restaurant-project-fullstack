@@ -1,24 +1,37 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-import type { User, LoginCredentials } from '../types/user';
+import { BASE_URL } from './config';
+import type { LoginCredentials, RegisterData } from '../types/user';
+import { handleApiError } from './utils';
 
-export const registerUser = async (user: User) => {
-    const response = await fetch(`${BASE_URL}/users/register`, {
+export const registerUser = async (userData: RegisterData) => {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ user })
-    })
-    return response.json()
-}
+        credentials: 'include',
+        body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+        // handleApiError всегда бросает ошибку, await не нужен, но оставляем для ясности
+        await handleApiError(response, 'Ошибка регистрации');
+    }
+    return response.json();
+};
 
-export const loginUser = async (user: LoginCredentials) => {
-    const response = await fetch(`${BASE_URL}/users/login`, {
+export const loginUser = async (credentials: LoginCredentials) => {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(user)
-    })
-    return response.json()
-}
+        credentials: 'include',
+        body: JSON.stringify(credentials)
+    });
+    
+    if (!response.ok) {
+        // handleApiError всегда бросает ошибку, await не нужен, но оставляем для ясности
+        await handleApiError(response, 'Ошибка входа');
+    }
+    return response.json();
+};

@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../utils/jwt.js";
+import { UnauthorizedError } from "../errors/unauthorized.js";
 
 export interface AuthRequest extends Request {
     userId?: string;
@@ -8,18 +9,16 @@ export interface AuthRequest extends Request {
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const authHeader = req.headers.authorization;
+        const token = req.cookies.accessToken
         
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: 'Требуется авторизация' });
+        if (!token) {
+            throw new UnauthorizedError('Недействительный токен')
         }
 
-        const token = authHeader.substring(7);
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-        
-        req.userId = decoded.userId;
+        res.locals.userId = decoded.userId as string;
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'Недействительный токен' });
+        throw new UnauthorizedError('Недействительный токен')
     }
 };

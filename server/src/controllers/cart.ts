@@ -7,7 +7,8 @@ import { BadRequestError } from "../errors/bad-request.js";
 
 export const getCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.userId).populate('cart.food');
+        const userId = res.locals.userId;
+        const user = await User.findById(userId as string).populate('cart.food');
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }
@@ -20,13 +21,14 @@ export const getCart = async (req: AuthRequest, res: Response, next: NextFunctio
 export const addToCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { foodId, quantity = 1 } = req.body;
+        const userId = res.locals.userId;
 
         const food = await Food.findById(foodId);
         if (!food) {
             throw new NotFoundError('Еда не найдена');
         }
 
-        const user = await User.findById(req.userId);
+        const user = await User.findById(userId as string);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }
@@ -62,6 +64,8 @@ export const updateCartItem = async (req: AuthRequest, res: Response, next: Next
             throw new BadRequestError('Количество должно быть больше 0');
         }
 
+
+        const userId = res.locals.userId;
         const user = await User.findById(req.userId);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
@@ -93,7 +97,9 @@ export const removeFromCart = async (req: AuthRequest, res: Response, next: Next
             throw new BadRequestError('ID еды обязателен');
         }
 
-        const user = await User.findById(req.userId);
+        const userId = res.locals.userId;
+
+        const user = await User.findById(userId as string);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }
@@ -119,7 +125,8 @@ export const removeFromCart = async (req: AuthRequest, res: Response, next: Next
 
 export const clearCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.userId);
+        const userId = res.locals.userId;
+        const user = await User.findById(userId as string);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }

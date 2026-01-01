@@ -2,6 +2,18 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Настройка переменных окружения
+
+Перед запуском приложения создайте файл `.env` в папке `client/` с следующим содержимым:
+
+```env
+VITE_BASE_URL=http://localhost:3000
+```
+
+Где `http://localhost:3000` - это URL вашего backend сервера.
+
+**Важно:** Если переменная `VITE_BASE_URL` не настроена, приложение будет использовать значение по умолчанию `http://localhost:3000`, но в консоли появится предупреждение.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

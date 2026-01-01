@@ -1,27 +1,52 @@
-import type { FoodItem } from "../types/cart";
+import { BASE_URL } from './config';
+import { handleApiError } from './utils';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+    };
+};
 
 export const getUserOrders = async () => {
-    const response = await fetch(`${BASE_URL}/orders`);
-    return response.json()
-}
+    const response = await fetch(`${BASE_URL}/orders`, {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        await handleApiError(response, 'Ошибка загрузки заказов');
+    }
+    
+    return response.json();
+};
 
 export const getOrderById = async (orderId: string) => {
-    const response = await fetch(`${BASE_URL}/orders/${orderId}`);
-    return response.json()
-}
+    const response = await fetch(`${BASE_URL}/orders/${orderId}`, {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        await handleApiError(response, 'Ошибка загрузки заказа');
+    }
+    
+    return response.json();
+};
 
-
-export const createOrder = async (foods: FoodItem[]) => {
+export const createOrder = async () => {
     const response = await fetch(`${BASE_URL}/orders`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ foods })
-    })
-    return response.json()
-}
+        headers: getAuthHeaders(),
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        await handleApiError(response, 'Ошибка создания заказа');
+    }
+    
+    return response.json();
+};
 
 

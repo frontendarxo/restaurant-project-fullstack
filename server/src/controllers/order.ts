@@ -10,11 +10,9 @@ import { UnauthorizedError } from "../errors/unauthorized.js";
 
 export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        if (!req.userId) {
-            throw new UnauthorizedError('Пользователь не авторизован');
-        }
 
-        const user = await User.findById(req.userId);
+        const userId = res.locals.userId;
+        const user = await User.findById(userId as string);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }
@@ -69,7 +67,8 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
 
 export const getUserOrders = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const orders = await Order.find({ user: req.userId })
+        const userId = res.locals.userId;
+        const orders = await Order.findById( userId as string )
             .populate('items.food')
             .sort({ createdAt: -1 });
 
@@ -83,9 +82,11 @@ export const getOrderById = async (req: AuthRequest, res: Response, next: NextFu
     try {
         const { orderId } = req.params;
 
+        const userId = res.locals.userId;
+
         const order = await Order.findOne({ 
             _id: orderId, 
-            user: req.userId 
+            user: userId as string 
         })
             .populate('items.food')
             .populate('user', 'name number');
