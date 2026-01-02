@@ -18,31 +18,74 @@ const getStatusText = (status: Order['status']): string => {
   return statusMap[status] || status;
 };
 
+const getStatusIcon = (status: Order['status']): string => {
+  const iconMap = {
+    pending: '⏳',
+    confirmed: '✅',
+    preparing: '👨‍🍳',
+    ready: '📦',
+    delivered: '🚚',
+    cancelled: '❌',
+  };
+  return iconMap[status] || '📋';
+};
+
 export const OrderCard = ({ order }: OrderCardProps) => {
-  const formattedDate = order.formatted_created_at || order.created_at;
+  if (!order || !order._id) {
+    return null;
+  }
+
+  const formattedDate = order.formatted_created_at || order.created_at || '';
+  const totalItems = order.items?.reduce((sum, item) => sum + (item?.quantity || 0), 0) || 0;
+  const orderId = order._id ? order._id.slice(-6) : 'N/A';
+  const address = order.address || 'Адрес не указан';
 
   return (
     <div className="order-card">
       <div className="order-card-header">
         <div className="order-card-info">
-          <span className="order-card-id">Заказ #{order._id.slice(-6)}</span>
-          <span className="order-card-date">{formattedDate}</span>
+          <div className="order-card-id-wrapper">
+            <span className="order-card-id">Заказ #{orderId}</span>
+            <span className="order-card-items-count">{totalItems} {totalItems === 1 ? 'товар' : 'товаров'}</span>
+          </div>
+          {formattedDate && (
+            <span className="order-card-date">📅 {formattedDate}</span>
+          )}
         </div>
-        <span className={`order-card-status order-card-status-${order.status}`}>
-          {getStatusText(order.status)}
+        <span className={`order-card-status order-card-status-${order.status || 'pending'}`}>
+          <span className="order-card-status-icon">{getStatusIcon(order.status || 'pending')}</span>
+          {getStatusText(order.status || 'pending')}
         </span>
       </div>
-      <div className="order-card-items">
-        {order.items.map((item, index) => (
-          <div key={index} className="order-card-item">
-            <span className="order-card-item-name">{item.food.name}</span>
-            <span className="order-card-item-quantity">x{item.quantity}</span>
-            <span className="order-card-item-price">{formatPrice(item.price * item.quantity)}</span>
-          </div>
-        ))}
+
+      <div className="order-card-address">
+        <span className="order-card-address-label">📍 Адрес доставки:</span>
+        <span className="order-card-address-value">{address}</span>
       </div>
+
+      <div className="order-card-items">
+        <div className="order-card-items-header">Состав заказа:</div>
+        {order.items?.map((item, index) => {
+          if (!item || !item.food) {
+            return null;
+          }
+          return (
+            <div key={index} className="order-card-item">
+              <div className="order-card-item-info">
+                <span className="order-card-item-name">{item.food.name || 'Неизвестный товар'}</span>
+                <span className="order-card-item-quantity">x{item.quantity || 0}</span>
+              </div>
+              <span className="order-card-item-price">
+                {formatPrice((item.price || 0) * (item.quantity || 0))}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
       <div className="order-card-footer">
-        <span className="order-card-total">Итого: {formatPrice(order.total)}</span>
+        <span className="order-card-total-label">Итого:</span>
+        <span className="order-card-total">{formatPrice(order.total || 0)}</span>
       </div>
     </div>
   );

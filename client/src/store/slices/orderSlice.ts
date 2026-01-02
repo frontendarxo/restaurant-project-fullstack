@@ -6,6 +6,7 @@ interface OrderState {
   orders: Order[];
   currentOrder: Order | null;
   isLoading: boolean;
+  isCreating: boolean;
   error: string | null;
 }
 
@@ -13,6 +14,7 @@ const initialState: OrderState = {
   orders: [],
   currentOrder: null,
   isLoading: false,
+  isCreating: false,
   error: null,
 };
 
@@ -50,7 +52,7 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.payload;
+        state.orders = action.payload || [];
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.isLoading = false;
@@ -69,16 +71,21 @@ const orderSlice = createSlice({
         state.error = action.error.message || 'Ошибка загрузки заказа';
       })
       .addCase(create.pending, (state) => {
-        state.isLoading = true;
+        state.isCreating = true;
         state.error = null;
       })
       .addCase(create.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isCreating = false;
         state.currentOrder = action.payload;
-        state.orders.unshift(action.payload);
+        if (!state.orders) {
+          state.orders = [];
+        }
+        if (action.payload) {
+          state.orders.unshift(action.payload);
+        }
       })
       .addCase(create.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isCreating = false;
         state.error = action.error.message || 'Ошибка создания заказа';
       });
   },

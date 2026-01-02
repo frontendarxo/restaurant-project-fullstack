@@ -43,6 +43,7 @@ export const CartTotal = ({ items }: CartTotalProps) => {
       await dispatch(create(address.trim())).unwrap();
       clearCart();
       setIsModalOpen(false);
+      setAddress('');
       navigate('/orders');
     } catch (error) {
       console.error('Ошибка создания заказа:', error);

@@ -7,15 +7,25 @@ interface OrderListProps {
 }
 
 export const OrderList = ({ orders }: OrderListProps) => {
-  if (orders.length === 0) {
-    return <div className="order-list-empty">У вас пока нет заказов</div>;
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="order-list-empty">
+        <div className="order-list-empty-icon">📦</div>
+        <h2 className="order-list-empty-title">У вас пока нет заказов</h2>
+        <p className="order-list-empty-text">
+          Когда вы сделаете заказ, он появится здесь
+        </p>
+      </div>
+    );
   }
 
   return (
     <div className="order-list">
-      {orders.map((order) => (
-        <OrderCard key={order._id} order={order} />
-      ))}
+      {orders
+        .filter((order) => order && order._id)
+        .map((order) => (
+          <OrderCard key={order._id} order={order} />
+        ))}
     </div>
   );
 };

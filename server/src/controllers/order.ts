@@ -6,7 +6,6 @@ import Food from "../modules/FoodSchema.js";
 import type { AuthRequest } from "../middlewares/auth.js";
 import { NotFoundError } from "../errors/not-found.js";
 import { BadRequestError } from "../errors/bad-request.js";
-import { UnauthorizedError } from "../errors/unauthorized.js";
 
 export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -49,7 +48,7 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
         );
 
         const order = new Order({
-            user: new mongoose.Types.ObjectId(req.userId),
+            user: new mongoose.Types.ObjectId(userId as string),
             items: orderItems,
             total,
             address: address.trim()
@@ -74,11 +73,12 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
 export const getUserOrders = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const userId = res.locals.userId;
-        const orders = await Order.findById( userId as string )
+        const orders = await Order.find({ user: userId as string })
             .populate('items.food')
-            .sort({ createdAt: -1 });
+            .populate('user', 'name number')
+            .sort({ created_at: -1 });
 
-        res.json({ orders });
+        res.json({ orders: orders || [] });
     } catch (error) {
         next(error);
     }
