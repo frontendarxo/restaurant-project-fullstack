@@ -69,15 +69,31 @@ const cartSlice = createSlice({
       })
       .addCase(addItem.fulfilled, (state, action) => {
         state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(addItem.rejected, (state, action) => {
+        state.error = action.error.message || 'Ошибка добавления в корзину';
       })
       .addCase(updateItem.fulfilled, (state, action) => {
         state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(updateItem.rejected, (state, action) => {
+        state.error = action.error.message || 'Ошибка обновления корзины';
       })
       .addCase(removeItem.fulfilled, (state, action) => {
         state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(removeItem.rejected, (state, action) => {
+        state.error = action.error.message || 'Ошибка удаления из корзины';
       })
       .addCase(clear.fulfilled, (state) => {
         state.items = [];
+        state.error = null;
+      })
+      .addCase(clear.rejected, (state, action) => {
+        state.error = action.error.message || 'Ошибка очистки корзины';
       });
   },
 });

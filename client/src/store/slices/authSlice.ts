@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { loginUser, registerUser } from '../../api/auth';
+import { loginUser, registerUser, getCurrentUser, logoutUser } from '../../api/auth';
 import type { User, AuthState, LoginCredentials, RegisterData } from '../../types/user';
 
 const initialState: AuthState & { isLoading: boolean; error: string | null } = {
   user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: !!localStorage.getItem('token'),
+  token: null,
+  isAuthenticated: false,
   isLoading: false,
   error: null,
 };
@@ -15,9 +15,6 @@ export const login = createAsyncThunk(
   'auth/login',
   async (user: LoginCredentials) => {
     const response = await loginUser(user);
-    if (response.token) {
-      localStorage.setItem('token', response.token);
-    }
     return response;
   }
 );
@@ -26,10 +23,22 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData: RegisterData) => {
     const response = await registerUser(userData);
-    if (response.token) {
-      localStorage.setItem('token', response.token);
-    }
     return response;
+  }
+);
+
+export const checkAuth = createAsyncThunk(
+  'auth/checkAuth',
+  async () => {
+    const response = await getCurrentUser();
+    return response;
+  }
+);
+
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async () => {
+    await logoutUser();
   }
 );
 
@@ -37,12 +46,6 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      localStorage.removeItem('token');
-    },
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
@@ -60,11 +63,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.isAuthenticated = true;
-        if (action.payload.token) {
-          localStorage.setItem('token', action.payload.token);
-        }
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -77,20 +76,35 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.isAuthenticated = true;
-        if (action.payload.token) {
-          localStorage.setItem('token', action.payload.token);
-        }
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Ошибка регистрации';
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
       });
   },
 });
 
-export const { logout, setUser, clearError } = authSlice.actions;
+export const { setUser, clearError } = authSlice.actions;
 export default authSlice.reducer;
 
 

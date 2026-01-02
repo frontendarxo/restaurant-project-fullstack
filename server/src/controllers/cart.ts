@@ -66,7 +66,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response, next: Next
 
 
         const userId = res.locals.userId;
-        const user = await User.findById(req.userId);
+        const user = await User.findById(userId as string);
         if (!user) {
             throw new NotFoundError('Пользователь не найден');
         }

@@ -1,17 +1,13 @@
 import { BASE_URL } from './config';
 import { handleApiError } from './utils';
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` })
-    };
-};
+const getHeaders = () => ({
+    'Content-Type': 'application/json'
+});
 
 export const getCart = async () => {
     const response = await fetch(`${BASE_URL}/cart`, {
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include'
     });
     
@@ -25,7 +21,7 @@ export const getCart = async () => {
 export const addToCart = async (foodId: string, quantity: number) => {
     const response = await fetch(`${BASE_URL}/cart`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify({ foodId, quantity })
     });
@@ -40,7 +36,7 @@ export const addToCart = async (foodId: string, quantity: number) => {
 export const updateCartItem = async (foodId: string, quantity: number) => {
     const response = await fetch(`${BASE_URL}/cart`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify({ foodId, quantity })
     });
@@ -55,7 +51,7 @@ export const updateCartItem = async (foodId: string, quantity: number) => {
 export const removeFromCart = async (foodId: string) => {
     const response = await fetch(`${BASE_URL}/cart`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify({ foodId })
     });
@@ -70,7 +66,7 @@ export const removeFromCart = async (foodId: string) => {
 export const clearCart = async () => {
     const response = await fetch(`${BASE_URL}/cart/clear`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include'
     });
     

@@ -1,17 +1,13 @@
 import { BASE_URL } from './config';
 import { handleApiError } from './utils';
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` })
-    };
-};
+const getHeaders = () => ({
+    'Content-Type': 'application/json'
+});
 
 export const getUserOrders = async () => {
     const response = await fetch(`${BASE_URL}/orders`, {
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include'
     });
     
@@ -24,7 +20,7 @@ export const getUserOrders = async () => {
 
 export const getOrderById = async (orderId: string) => {
     const response = await fetch(`${BASE_URL}/orders/${orderId}`, {
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include'
     });
     
@@ -38,7 +34,7 @@ export const getOrderById = async (orderId: string) => {
 export const createOrder = async () => {
     const response = await fetch(`${BASE_URL}/orders`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getHeaders(),
         credentials: 'include'
     });
     

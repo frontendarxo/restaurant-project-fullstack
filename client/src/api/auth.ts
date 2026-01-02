@@ -13,7 +13,6 @@ export const registerUser = async (userData: RegisterData) => {
     });
     
     if (!response.ok) {
-        // handleApiError всегда бросает ошибку, await не нужен, но оставляем для ясности
         await handleApiError(response, 'Ошибка регистрации');
     }
     return response.json();
@@ -30,8 +29,31 @@ export const loginUser = async (credentials: LoginCredentials) => {
     });
     
     if (!response.ok) {
-        // handleApiError всегда бросает ошибку, await не нужен, но оставляем для ясности
         await handleApiError(response, 'Ошибка входа');
+    }
+    return response.json();
+};
+
+export const getCurrentUser = async () => {
+    const response = await fetch(`${BASE_URL}/auth/me`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        await handleApiError(response, 'Ошибка проверки авторизации');
+    }
+    return response.json();
+};
+
+export const logoutUser = async () => {
+    const response = await fetch(`${BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        await handleApiError(response, 'Ошибка выхода');
     }
     return response.json();
 };

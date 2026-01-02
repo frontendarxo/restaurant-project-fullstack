@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import User from "../modules/userSchema.js";
 import { BadRequestError } from "../errors/bad-request.js";
 import { ConflictError } from "../errors/conflict.js";
+import { UnauthorizedError } from "../errors/unauthorized.js";
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -46,10 +47,13 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         const token = user.generateAuthToken();
 
         res.status(201)
-        .cookie('accessToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        .cookie('accessToken', token, { 
+            httpOnly: true, 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax'
+        })
         .json({ 
             message: 'Пользователь успешно зарегистрирован', 
-            token,
             user: { id: user._id, name: user.name, number: user.number }
         });
 
@@ -78,12 +82,44 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const user = await User.findByCredentials(numberValue, password);
         const token = user.generateAuthToken();
         res
-        .cookie('accessToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        .cookie('accessToken', token, { 
+            httpOnly: true, 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax'
+        })
         .json({ 
             message: 'Успешный вход',
-            token,
             user: { id: user._id, name: user.name, number: user.number }
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = res.locals.userId;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return next(new UnauthorizedError('Пользователь не найден'));
+        }
+        
+        res.json({ 
+            user: { id: user._id, name: user.name, number: user.number }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: 'lax',
+        })
+        .json({ message: 'Выход выполнен успешно' });
     } catch (error) {
         next(error);
     }
