@@ -30,19 +30,23 @@ export const CartItem = ({ item }: CartItemProps) => {
         <p className="cart-item-price">{formatPrice(item.food.price)}</p>
       </div>
       <div className="cart-item-controls">
-        <button
-          className="cart-item-button"
-          onClick={() => handleQuantityChange(item.quantity - 1)}
-        >
-          -
-        </button>
-        <span className="cart-item-quantity">{item.quantity}</span>
-        <button
-          className="cart-item-button"
-          onClick={() => handleQuantityChange(item.quantity + 1)}
-        >
-          +
-        </button>
+        <div className="cart-item-quantity-controls">
+          <button
+            className="cart-item-button"
+            onClick={() => handleQuantityChange(item.quantity - 1)}
+            aria-label="Уменьшить количество"
+          >
+            −
+          </button>
+          <span className="cart-item-quantity">{item.quantity}</span>
+          <button
+            className="cart-item-button"
+            onClick={() => handleQuantityChange(item.quantity + 1)}
+            aria-label="Увеличить количество"
+          >
+            +
+          </button>
+        </div>
         <button className="cart-item-remove" onClick={handleRemove}>
           Удалить
         </button>

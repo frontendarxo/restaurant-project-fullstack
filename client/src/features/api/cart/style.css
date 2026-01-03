@@ -2,22 +2,72 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: calc(100vh - 200px);
 }
 
 .cart h1 {
   color: white;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cart h1::before {
+  content: '🛒';
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .cart-loading,
 .cart-error {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin-top: 2rem;
+}
+
+.cart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cart-loading::before {
+  content: '⏳';
+  font-size: 2rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .cart-error {
   color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.cart-error::before {
+  content: '⚠️';
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
